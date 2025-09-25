@@ -4,9 +4,9 @@ import "fmt"
 
 func main() {
 	number, eur, usd := output()
-	result1, result2 := countCurrencies(number, eur, usd)
-	fmt.Printf("Указанное количество рублей = %.2f EUR \n", result1)
-	fmt.Printf("указанное количество рублей = %.2f USD", result2)
+	resultEUR, resultUSD := countCurrencies(number, eur, usd)
+	fmt.Printf("Указанное количество рублей = %.2f EUR \n", resultEUR)
+	fmt.Printf("указанное количество рублей = %.2f USD", resultUSD)
 }
 func output() (float64, float64, float64) {
 	var numberCurrency, EUR, USD float64
