@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -15,15 +14,12 @@ const RUBonUSD = 0.012
 func main() {
 	fmt.Println("__Конвертор валют__")
 	for {
-		original, error1, quantity, error2, final, error3, error4 := Input()
-		if error1 != nil {
-			fmt.Println(error1, "Таких значений для конвертации не существует")
-		} else if error3 != nil {
-			fmt.Println(error3, "Таких значений для конвертации не существует")
-		} else if error2 != nil {
-			fmt.Println(error2, "Валюта не может быть равна нулю или отрицательному значению")
-		} else if error4 != nil {
-			fmt.Println(error4, "Указанные валюты не могут быть одинаковы")
+		original := inputOriginal()
+		quantity := inputQuantity()
+		final := inputFinal()
+		if original == final {
+			fmt.Println("ERROR4: Валюты не могут быть одинаковы, пожалуйста повторите попытку")
+			continue
 		}
 		outputCurrency(original, quantity, final)
 		if choice() {
@@ -34,28 +30,41 @@ func main() {
 		}
 	}
 }
-func Input() (string, error, float64, error, string, error, error) {
-	var originalCurrency, finalCurrency string
-	var quantity float64
-	fmt.Println("Укажите вашу валюту для дальнейшей конвертации (USD/EUR/RUB)")
-	fmt.Scan(&originalCurrency)
-	if originalCurrency != "RUB" && originalCurrency != "EUR" && originalCurrency != "USD" {
-		return "", errors.New("ERROR1"), 0, nil, "", nil, nil
+func inputOriginal() string {
+	for {
+		var originalCurrency string
+		fmt.Println("Укажите вашу валюту для дальнейшей конвертации (USD/EUR/RUB)")
+		fmt.Scan(&originalCurrency)
+		if originalCurrency != "RUB" && originalCurrency != "EUR" && originalCurrency != "USD" {
+			fmt.Println("ERROR1: Таких значений для конвертации не существует, пожалуйста повторите попытку ")
+			continue
+		}
+		return originalCurrency
 	}
-	fmt.Println("Укажите количество вашей валюты")
-	fmt.Scan(&quantity)
-	if quantity <= 0 {
-		return "", nil, 0, errors.New("ERROR2"), "", nil, nil
+}
+func inputQuantity() float64 {
+	for {
+		var quantity float64
+		fmt.Println("Укажите количество вашей валюты")
+		fmt.Scan(&quantity)
+		if quantity <= 0 {
+			fmt.Println("ERROR2: Валюта не может быть равна нулю или отрицательному значению, пожалуйста повторите попытку")
+			continue
+		}
+		return quantity
 	}
-	fmt.Println("Укажите валюту в которую вы хотите конвертировать деньги (USD/EUR/RUB)")
-	fmt.Scan(&finalCurrency)
-	if finalCurrency != "EUR" && finalCurrency != "USD" && finalCurrency != "RUB" {
-		return "", nil, 0, nil, "", errors.New("ERROR3"), nil
+}
+func inputFinal() string {
+	for {
+		var finalCurrency string
+		fmt.Println("Укажите валюту в которую вы хотите конвертировать деньги (USD/EUR/RUB)")
+		fmt.Scan(&finalCurrency)
+		if finalCurrency != "EUR" && finalCurrency != "USD" && finalCurrency != "RUB" {
+			fmt.Println("ERROR3: Таких значений для конвертации не существует, пожалуйста повторите попытку")
+			continue
+		}
+		return finalCurrency
 	}
-	if originalCurrency == "EUR" && finalCurrency == "EUR" || originalCurrency == "USD" && finalCurrency == "USD" || originalCurrency == "RUB" && finalCurrency == "RUB" {
-		return "", nil, 0, nil, "", nil, errors.New("ERROR4")
-	}
-	return originalCurrency, nil, quantity, nil, finalCurrency, nil, nil
 }
 func outputCurrency(original string, quantity float64, final string) {
 	switch {
