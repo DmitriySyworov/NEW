@@ -5,26 +5,46 @@ import (
 	"fmt"
 )
 
-type currencyType = map[string]float64
+type currencyType = map[string]*float64
 
 func main() {
-	fmt.Println("__Конвертор валют__")
-	variableCurrency := currencyType{
-		"EURonUSD": 1.17,
-		"EURonRUB": 97.35,
-		"USDonEUR": 0.85,
-		"USDonRUB": 82.9,
-		"RUBonEUR": 0.01,
-		"RUBonUSD": 0.012,
+	EU := 1.17
+	ER := 97.35
+	UE := 0.85
+	UR := 82.9
+	RE := 0.01
+	RU := 0.012
+	fmt.Println("Конвертор валют")
+	currency := currencyType{
+		"EURonUSD": &EU,
+		"EURonRUB": &ER,
+		"USDonEUR": &UE,
+		"USDonRUB": &UR,
+		"RUBonEUR": &RE,
+		"RUBonUSD": &RU,
 	}
-	for {
-		quantity, err1 := inputAndChoiceCurrencyTransaction()
 
+	for {
+		original, err1 := inputOriginal()
 		if err1 != nil {
-			fmt.Println(err1, "Валюта не может быть равна нулю или отрицательному значению, пожалуйста повторите попытку")
+			fmt.Println(err1, "Таких значений для конвертации не существует, пожалуйста повторите попытку")
 			continue
 		}
-		outputCurrency(quantity, variableCurrency)
+		quantity, err2 := inputQuantity()
+		if err2 != nil {
+			fmt.Println(err2, "Валюта не может быть равна нулю или отрицательному значению, пожалуйста повторите попытку")
+			continue
+		}
+		final, err3 := inputFinal()
+		if err3 != nil {
+			fmt.Println(err3, "Таких значений для конвертации не существует, пожалуйста повторите попытку")
+			continue
+		}
+		if original == final {
+			fmt.Println("ERROR4: Валюты не могут быть одинаковы, пожалуйста повторите попытку")
+			continue
+		}
+		fmt.Println(coutCurrency(currency[original+"on"+final], quantity))
 		if choice() {
 			fmt.Println("Повторный расчет:")
 		} else {
@@ -33,28 +53,36 @@ func main() {
 		}
 	}
 }
-func inputAndChoiceCurrencyTransaction() (float64, error) {
-	fmt.Println(`Укажите количество валюты для ее рассчета, где первая валюта - ваша изначальная:
-EURonUSD - из евро в доллары
-EURonRUB -  из евро в рубли
-USDonEUR - из долларов в евро
-USDonRUB - из долларов в рубли
-RUBonEUR - из рублей в евро
-RUBonUSD - из рублей в доллары`)
+func inputOriginal() (string, error) {
+	var originalCurrency string
+	fmt.Println("Укажите вашу валюту для дальнейшей конвертации (USD/EUR/RUB)")
+	fmt.Scan(&originalCurrency)
+	if originalCurrency != "RUB" && originalCurrency != "EUR" && originalCurrency != "USD" {
+		return "", errors.New("ERROR1:")
+	}
+	return originalCurrency, nil
+}
+
+func inputQuantity() (float64, error) {
 	var quantity float64
+	fmt.Println("Укажите количество вашей валюты")
 	fmt.Scan(&quantity)
 	if quantity <= 0 {
 		return 0, errors.New("ERROR2:")
 	}
 	return quantity, nil
 }
-
-func outputCurrency(quantity float64, variableCurrency currencyType) {
-	variableCurrency2 := currencyType{}
-	for key, value := range variableCurrency {
-		variableCurrency2[key] = value * quantity
-		fmt.Printf("%s = %.2f \n", key, variableCurrency2[key])
+func inputFinal() (string, error) {
+	var finalCurrency string
+	fmt.Println("Укажите валюту в которую вы хотите конвертировать деньги (USD/EUR/RUB)")
+	fmt.Scan(&finalCurrency)
+	if finalCurrency != "EUR" && finalCurrency != "USD" && finalCurrency != "RUB" {
+		return "", errors.New("ERROR3:")
 	}
+	return finalCurrency, nil
+}
+func coutCurrency(maps *float64, quantity float64) float64 {
+	return *maps * quantity
 }
 func choice() bool {
 	var choice string
